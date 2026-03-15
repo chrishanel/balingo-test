@@ -19,8 +19,10 @@ export default function GameGridStakes({gameId, stakes, selectedStake, onCardCli
                     </Grid>
                 ))}
             </Grid>
-            <Typography mt={1} fontSize={18} sx={{textShadow: '0 5px 0 #000'}}>SELECT CURRENT STAKE</Typography>
-            <Typography mt={0.5} fontSize={14} lineHeight={1} sx={{textShadow: '0 5px 0 #000'}}>
+            <Typography mt={1} fontSize={18} sx={{textShadow: '1.354px 1.354px 0 #000'}}>
+                SELECT CURRENT STAKE
+            </Typography>
+            <Typography mt={0.5} fontSize={14} lineHeight={1} sx={{textShadow: '1.354px 1.354px 0 #000'}}>
                 GAME ID: {gameId}
             </Typography>
         </Box>

@@ -31,6 +31,7 @@ const stakes: GameStake[] = [
     {
         stakeColor: 'black',
         backgroundColor: '#FFF',
+        selectedBackgroundColor: '#000',
         borderColor: '#7f7f7f',
     },
     {
