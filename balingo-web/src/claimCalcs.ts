@@ -1,4 +1,4 @@
-import type {FirebaseGameClaims} from "./types/FirebaseGameClaim";
+import type {FirebaseGameClaims} from "./types/firebase/FirebaseGameClaim";
 import type {GameClaim} from "./types/GameClaim";
 
 const stakeLevels = [
@@ -32,11 +32,13 @@ export function calculateTopClaims(firebaseGameClaims: FirebaseGameClaims): Game
         claimedBy = (red.claimTime ?? Number.MAX_VALUE) < (blue.claimTime ?? Number.MAX_VALUE) ? 'red' : 'blue';
     }
 
-    const possibleClaimedStake = redClaimLevel > blueClaimLevel ? red.claimedStake : blue.claimedStake;
+    const possibleClaimedStake = claimedBy === 'red' ? red.claimedStake : blue.claimedStake;
+    const possibleClaimTime = claimedBy === 'red' ? red.claimTime : blue.claimTime;
 
     return {
         isClaimed: isClaimed,
         claimedBy: claimedBy,
+        claimTime: isClaimed ? possibleClaimTime : undefined,
         claimedStake: isClaimed ? possibleClaimedStake : undefined,
     }
 }

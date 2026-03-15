@@ -1,11 +1,12 @@
 import {initializeApp} from "firebase/app";
 import {getDatabase, onValue, ref, set, update} from "firebase/database";
-import type {FirebaseGameClaims} from "./types/FirebaseGameClaim";
-import type {FirebaseGameGridSlot} from "./types/FirebaseGameGridSlot";
 import {getAuth, signInAnonymously} from "firebase/auth";
-import type {FirebaseGameConfig} from "./types/FirebaseGameConfig";
-import type {FirebaseGame} from "./types/FirebaseGame";
 import type {GameStake} from "./types/GameStake";
+import type {FirebaseChallenge} from "./types/firebase/FirebaseChallenge";
+import {getRandomString, shuffleArray} from "./utils";
+import type {FirebaseGame} from "./types/firebase/FirebaseGame";
+import type {FirebaseGameClaims} from "./types/firebase/FirebaseGameClaim";
+import type {FirebaseGameConfig} from "./types/firebase/FirebaseGameConfig";
 
 
 const firebaseConfig = {
@@ -22,20 +23,20 @@ const app = initializeApp(firebaseConfig);
 
 export const database = getDatabase(app);
 
-export const onGridSlotValue = (gameId: string, callback: (gameSlots: FirebaseGameGridSlot[]) => void) => {
-    return onValue(ref(database, `/games/${gameId}/categories`), (snapshot) => {
+export const onGridSlotValue = (gameId: string, callback: (gameSlots: FirebaseChallenge[]) => void) => {
+    return onValue(ref(database, `/games/${gameId.toUpperCase()}/challenges`), (snapshot) => {
         callback(snapshot.val());
     })
 }
 
 export const onGridClaimsValue = (gameId: string, callback: (gameClaims: FirebaseGameClaims[]) => void) => {
-    return onValue(ref(database, `/games/${gameId}/claims`), (snapshot) => {
+    return onValue(ref(database, `/games/${gameId.toUpperCase()}/claims`), (snapshot) => {
         callback(snapshot.val());
     })
 }
 
 export const onGameConfigValue = (gameId: string, callback: (gameConfig: FirebaseGameConfig) => void) => {
-    return onValue(ref(database, `/games/${gameId}/config`), (snapshot) => {
+    return onValue(ref(database, `/games/${gameId.toUpperCase()}/config`), (snapshot) => {
         callback(snapshot.val());
     })
 }
@@ -43,7 +44,7 @@ export const onGameConfigValue = (gameId: string, callback: (gameConfig: Firebas
 export const joinGame = async (gameCode: string, playerName: string, onComplete: (success: boolean, message?: string) => void) => {
     const auth = getAuth();
 
-    const gameResponse = await fetch(`${firebaseConfig.databaseURL}/games/${gameCode}.json`)
+    const gameResponse = await fetch(`${firebaseConfig.databaseURL}/games/${gameCode.toUpperCase()}.json`)
 
     const game: FirebaseGame = await gameResponse.json();
 
@@ -69,53 +70,100 @@ export const joinGame = async (gameCode: string, playerName: string, onComplete:
 
             await update(ref(database, `/games/${gameCode}/config/${isBlue ? 'blue' : 'red'}`), player)
 
+            await update(ref(database, `/games/${gameCode}/config/`), {gameStartTime: Date.now()});
+
             onComplete(true);
         })
         .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(errorCode, errorMessage);
+            console.error(errorCode, errorMessage);
             //TODO: Modal? Toast?r
         });
 }
 
-export const createNewGame = (gameCode: string, playerName: string, isBlue: boolean, onSuccess: () => void) => {
-    const auth = getAuth();
-    signInAnonymously(auth)
-        .then(async (userCredential) => {
-            const player = {
-                id: userCredential.user.uid,
-                name: playerName,
-            }
+export const createNewGame = async (gameCode: string, playerName: string, isBlue: boolean): Promise<boolean> => {
+    try {
+        const auth = getAuth();
 
-            await set(ref(database, `/games/${gameCode}`), {
-                categories: [],
-                claims: [],
-                config: {
-                    gameCode: gameCode,
-                    red: !isBlue ? player : {},
-                    blue: isBlue ? player : {},
+        const challenges = await getRandomChallenges();
+
+        if (!challenges) {
+            return false;
+        }
+
+        const userCredential = await signInAnonymously(auth);
+        const player = {
+            id: userCredential.user.uid,
+            name: playerName,
+        }
+
+        await set(ref(database, `/games/${gameCode}`), {
+            challenges: challenges,
+            claims: Array.from({length: 25}, () => ({
+                red: {
+                    isClaimed: false
+                },
+                blue: {
+                    isClaimed: false
                 }
-            })
-
-            onSuccess();
+            })),
+            config: {
+                gameCode: gameCode,
+                createTime: Date.now(),
+                red: !isBlue ? player : {},
+                blue: isBlue ? player : {},
+            }
         })
-        .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorCode, errorMessage);
-            //TODO: Modal? Toast?r
-        });
+
+        return true;
+    } catch (error) {
+        console.error(error);
+        //TODO: Modal? Toast?r
+        return false
+    }
+}
+
+const getRandomChallenges = async (): Promise<FirebaseChallenge[] | undefined> => {
+    const challengeResponse = await fetch(`${firebaseConfig.databaseURL}/challenges.json`)
+
+    if (!challengeResponse.ok) {
+        return undefined;
+    }
+
+    const challenges = await challengeResponse.json() as FirebaseChallenge[];
+
+    const center = challenges.find(c => c.type === 'center');
+
+    if (!center) {
+        return undefined;
+    }
+
+    const shuffledChallenges: FirebaseChallenge[] = shuffleArray(challenges.filter(c => c.type !== 'center'));
+
+    const randomChallenges = shuffledChallenges.slice(0, 24);
+
+    return [
+        ...randomChallenges.slice(0, 12),
+        // Add the seed text on creation
+        {...center, seedText: getRandomString(6)},
+        ...randomChallenges.slice(12)
+    ]
 }
 
 export const setCompletedSlot = async (gameCode: string, slotNumber: number, stake: GameStake) => {
-
     const gameResponse = await fetch(`${firebaseConfig.databaseURL}/games/${gameCode}/config.json`)
 
     const gameConfig: FirebaseGameConfig = await gameResponse.json();
 
     if (!gameConfig) {
         console.error(`Game config for game ${gameCode} not found even though you're in a game. That's odd.`);
+        return;
+    }
+
+    if (!gameConfig.blue || !gameConfig.red) {
+        //TODO: Toast?
+        console.error(`The game hasn't started yet.`);
         return;
     }
 
@@ -149,5 +197,18 @@ export const setCompletedSlot = async (gameCode: string, slotNumber: number, sta
         await set(ref(database, claimUrl), updatedClaim);
     } else {
         console.error("No valid user found.");
+    }
+}
+
+export const markGameAsDone = async (gameCode: string, gameEndTime: number): Promise<void> => {
+    try {
+        const auth = getAuth();
+        const user = auth.currentUser
+
+        if (user) {
+            await update(ref(database, `/games/${gameCode}/config/`), {gameEndTime});
+        }
+    } catch (e) {
+        console.error("error attempting to mark game as done", e);
     }
 }

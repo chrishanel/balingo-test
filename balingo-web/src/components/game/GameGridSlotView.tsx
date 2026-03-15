@@ -1,5 +1,6 @@
 import {Box, Button, Typography} from "@mui/material";
 import type {GameGridSlot} from "../../types/GameGridSlot";
+import {useEffect, useState} from "react";
 
 const defaultBgColor = "#2E3A3C";
 
@@ -9,7 +10,8 @@ interface GameGridSlotViewProps {
 }
 
 export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps) {
-    const {text, backgroundColor, seedText, chipColor, showChip} = slot ?? {};
+    const {text, backgroundColor: slotBgColor, seedText, chipColor, showChip} = slot ?? {};
+    const [currentTime, setCurrentTime] = useState<number>(new Date().getTime());
 
     const handleSlotClick = () => {
         if (slot) {
@@ -17,11 +19,26 @@ export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps)
         }
     }
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentTime(new Date().getTime());
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [])
+
+    const backgroundColor = slotBgColor ?? defaultBgColor;
+
     return (
         <Button sx={{m: 0, p: 0, color: "#FFF"}} onClick={handleSlotClick}>
             <Box display="flex" position="relative" flexDirection="column"
-                 justifyContent={seedText ? "space-between" : "center"}
-                 alignItems="center" borderRadius={1.5} sx={{aspectRatio: 1.1}} width={{xs: 75, sm: 90, md: 124}}
+                 justifyContent={seedText ? "space-between" : "center"} alignItems="center"
+                 width={{xs: 75, sm: 90, md: 124}} p={0.5} borderRadius={1.5}
+                 sx={{
+                     aspectRatio: 1.1,
+                     containerType: 'size',
+                     overflow: 'hidden',
+                 }}
                  border={chipColor === 'gold' ? "3px solid #F2C255" : `3px solid ${backgroundColor}`}
                  bgcolor={backgroundColor ?? defaultBgColor} textAlign="center">
                 {showChip && chipColor && (
@@ -29,11 +46,11 @@ export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps)
                         <img src={`/images/chips/${chipColor}-chip.png`} alt={`${chipColor} poker chip`}/>
                     </Box>
                 )}
-                <Typography fontSize={{xs: 12, sm: 24}} lineHeight="normal" p={1}>{text}</Typography>
+                <Typography fontSize="24cqh" lineHeight="normal" pt={0.5}>{text}</Typography>
                 {seedText && (
                     <Box width="90%" bgcolor="#172325" borderRadius={1}
                          boxShadow="1.354px 1.354px 0 0 rgba(0, 0, 0, 0.40);">
-                        <Typography fontSize={{xs: 14, sm: 28}} lineHeight={'normal'} p={0.5}>{seedText}</Typography>
+                        <Typography fontSize={{xs: 14, sm: 28}} lineHeight={'normal'} pt={0.5}>{seedText}</Typography>
                     </Box>
                 )}
             </Box>

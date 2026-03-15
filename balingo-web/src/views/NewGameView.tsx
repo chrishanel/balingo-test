@@ -47,9 +47,11 @@ export default function NewGameView() {
         }
 
         if (!hasGameCodeError && !hasPlayerNameError) {
-            createNewGame(gameCode, playerName, isBlue, () => {
-                navigate({to: `/games/${gameCode}`})
-            });
+            const isSuccessful = await createNewGame(gameCode, playerName, isBlue);
+
+            if (isSuccessful) {
+                await navigate({to: `/games/${gameCode}`})
+            }
         }
     }
 

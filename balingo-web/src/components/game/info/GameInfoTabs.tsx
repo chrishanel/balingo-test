@@ -46,21 +46,23 @@ export default function GameInfoTabs() {
                 )
             case 2:
                 return (
-                    <Box>
-                        <Box>
+                    <ul>
+                        <li>
                             <GameInfoTabText
                                 text="Balingo is a WIP prototype designed by Chris Hanel, inspired by many iterations of Bingo
                             across the speedrunning community. If all goes well, the intention is to make this a proper
                             Balatro Mod with auto-tracking and more features that are both player-friendly and a better
-                            viewing experience for spectators."/></Box>
-                        <Box>
+                            viewing experience for spectators."/>
+                        </li>
+                        <li>
                             <GameInfoTabText
-                                text="Developer: Michael Fazio"/></Box>
-                        <Box>
+                                text="Developer: Michael Fazio"/>
+                        </li>
+                        <li>
                             <GameInfoTabText
                                 text="Special Thanks: Ben Pelc, Zac Gallen, and definitely *not* Pablo Lopez's UCL."/>
-                        </Box>
-                    </Box>
+                        </li>
+                    </ul>
                 )
         }
     }
@@ -78,7 +80,7 @@ export default function GameInfoTabs() {
                     <Tab label="About"/>
                 </Tabs>
             </Box>
-            <Box textAlign="left" mt={1}>
+            <Box textAlign="left" mt={1} p={1} width="100%" maxWidth={800}>
                 {getTabContents(selectedTab)}
             </Box>
         </Box>
