@@ -49,7 +49,7 @@ export function calculateLastGameEndingClaimTime(gridSlots: GameGridSlot[], curr
     const completedGridSlotTime = !isGridComplete(gridSlots) ? undefined : lastClaimTime;
 
     const earliestRowClaimTime = getEarliestClaimTime(chunkedSlots);
-    const earliestColumnClaimTime = getEarliestClaimTime(chunkedSlots);
+    const earliestColumnClaimTime = getEarliestClaimTime(getColumns(chunkedSlots));
 
     //TODO: More than half claimed
     //TODO: Diagonal
