@@ -36,7 +36,8 @@ export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps)
                         <img src={`/images/chips/${chipColor}-chip.png`} alt={`${chipColor} poker chip`}/>
                     </Box>
                 )}
-                <Typography fontSize="24cqh" lineHeight="normal" pt={0.5}>{text}</Typography>
+                <Typography fontSize="24cqh" lineHeight="normal" pt={0.5}
+                            sx={{textShadow: "1.354px 1.354px 0 #000"}}>{text}</Typography>
                 {seedText && (
                     <Box width="90%" bgcolor="#172325" borderRadius={1}
                          boxShadow="1.354px 1.354px 0 0 rgba(0, 0, 0, 0.40);">
