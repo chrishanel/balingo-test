@@ -32,7 +32,7 @@ export default function BalingoButton({text, buttonColor, size, onClick}: Baling
 
     return (
         <Button sx={buttonStyle} color={'white'} onClick={onClick}>
-            <Typography fontSize={36} sx={{textShadow: '0 3px 0 #000'}}>{text}</Typography>
+            <Typography fontSize={36} sx={{textShadow: '0 3px 0 #000', textTransform: 'uppercase'}}>{text}</Typography>
         </Button>
     )
 }

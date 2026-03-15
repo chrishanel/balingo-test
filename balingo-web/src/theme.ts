@@ -9,6 +9,9 @@ export const theme = createTheme({
     },
     typography: {
         fontFamily: ['m6x11', 'JetBrains Mono', 'monospace'].join(','),
+        button: {
+            textTransform: 'none',
+        }
     },
 });
 

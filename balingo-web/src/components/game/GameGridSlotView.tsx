@@ -1,6 +1,5 @@
 import {Box, Button, Typography} from "@mui/material";
 import type {GameGridSlot} from "../../types/GameGridSlot";
-import {useEffect, useState} from "react";
 
 const defaultBgColor = "#2E3A3C";
 
@@ -11,21 +10,12 @@ interface GameGridSlotViewProps {
 
 export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps) {
     const {text, backgroundColor: slotBgColor, seedText, chipColor, showChip} = slot ?? {};
-    const [currentTime, setCurrentTime] = useState<number>(new Date().getTime());
 
     const handleSlotClick = () => {
         if (slot) {
             onClick?.();
         }
     }
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentTime(new Date().getTime());
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, [])
 
     const backgroundColor = slotBgColor ?? defaultBgColor;
 

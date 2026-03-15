@@ -29,7 +29,9 @@ export default function GameGridStakeCard({stake, isSelected, onClick}: GameGrid
                     <img src={`/images/chips/${stakeColor}-chip.png`} width={25} height={25}
                          alt={`${stakeColor} chip image`}/>
                     <Typography color="white" fontSize={24} mt={-1.5} lineHeight={1}
-                                sx={{textShadow: '1.354px 1.354px 0 #000'}}>{stakeColor}</Typography>
+                                sx={{textShadow: '1.354px 1.354px 0 #000', textTransform: 'uppercase'}}>
+                        {stakeColor}
+                    </Typography>
                 </Box>
             ) : (
                 <Box display="flex" justifyContent="center" alignItems="center" height="100%">
