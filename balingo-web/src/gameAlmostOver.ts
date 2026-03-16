@@ -12,6 +12,15 @@ function getColumns(chunkedSlots: GameGridSlot[][]): GameGridSlot[][] {
     }, [] as GameGridSlot[][]);
 }
 
+function getDiagonals(chunkedSlots: GameGridSlot[][]): GameGridSlot[][] {
+    return chunkedSlots.reduce((grid, row, rowIndex) => {
+        grid[0].push(row[rowIndex]);
+        grid[1].push(row[row.length - rowIndex - 1]);
+
+        return grid;
+    }, [[], []] as GameGridSlot[][]);
+}
+
 function isAnyRowComplete(chunkedSlots: GameGridSlot[][]): boolean {
     return chunkedSlots.some(row => row.every(slot => !!slot.claimedBy && row[0].claimedBy === slot.claimedBy));
 }
@@ -20,6 +29,12 @@ function isAnyColumnComplete(chunkedSlots: GameGridSlot[][]): boolean {
     const columns = getColumns(chunkedSlots);
 
     return columns.some(column => column.every(slot => !!slot.claimedBy && column[0].claimedBy === slot.claimedBy))
+}
+
+function isEitherDiagonalComplete(chunkedSlots: GameGridSlot[][]): boolean {
+    const diagonals = getDiagonals(chunkedSlots);
+
+    return diagonals.some(column => column.every(slot => !!slot.claimedBy && column[0].claimedBy === slot.claimedBy))
 }
 
 function isGridComplete(gridSlots: GameGridSlot[]): boolean {
@@ -40,7 +55,10 @@ function getEarliestClaimTime(grid: GameGridSlot[][]): number | undefined {
 export function calculateGameAlmostOver(gridSlots: GameGridSlot[]): boolean {
     const chunkedSlots = [...chunked(gridSlots, 5)]
 
-    return isAnyRowComplete(chunkedSlots) || isAnyColumnComplete(chunkedSlots) || isGridComplete(gridSlots);
+    return isAnyRowComplete(chunkedSlots) ||
+        isAnyColumnComplete(chunkedSlots) ||
+        isEitherDiagonalComplete(chunkedSlots) ||
+        isGridComplete(gridSlots);
 }
 
 export function calculateLastGameEndingClaimTime(gridSlots: GameGridSlot[], currentTime: number, lastClaimTime?: number): number | undefined {
@@ -50,14 +68,17 @@ export function calculateLastGameEndingClaimTime(gridSlots: GameGridSlot[], curr
 
     const earliestRowClaimTime = getEarliestClaimTime(chunkedSlots);
     const earliestColumnClaimTime = getEarliestClaimTime(getColumns(chunkedSlots));
+    const earliestDiagonalClaimTime = getEarliestClaimTime(getDiagonals(chunkedSlots));
+
+    const isAnyLineDone = earliestRowClaimTime || earliestColumnClaimTime || earliestDiagonalClaimTime;
 
     //TODO: More than half claimed
-    //TODO: Diagonal
 
     const time = Math.min(
         earliestRowClaimTime ?? currentTime,
         earliestColumnClaimTime ?? currentTime,
-        !earliestColumnClaimTime && !earliestColumnClaimTime && completedGridSlotTime ? completedGridSlotTime : currentTime,
+        earliestDiagonalClaimTime ?? currentTime,
+        !isAnyLineDone && completedGridSlotTime ? completedGridSlotTime : currentTime,
     ) + (1000 * 60 * 5)
 
     return time && time > 0 ? time : undefined;
