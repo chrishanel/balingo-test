@@ -70,8 +70,6 @@ export const joinGame = async (gameCode: string, playerName: string, onComplete:
 
             await update(ref(database, `/games/${gameCode}/config/${isBlue ? 'blue' : 'red'}`), player)
 
-            await update(ref(database, `/games/${gameCode}/config/`), {gameStartTime: Date.now()});
-
             onComplete(true);
         })
         .catch((error) => {
@@ -122,6 +120,10 @@ export const createNewGame = async (gameCode: string, playerName: string, isBlue
         //TODO: Modal? Toast?r
         return false
     }
+}
+
+export const startGame = async (gameId: string) => {
+    await update(ref(database, `/games/${gameId}/config/`), {gameStartTime: Date.now()});
 }
 
 const getRandomChallenges = async (): Promise<FirebaseChallenge[] | undefined> => {

@@ -71,7 +71,7 @@ export default function GameBoard() {
     return (
         <Box maxWidth="100%">
             <GameGridHeader gameCode={gameId} gridSlots={gridSlots} gameConfig={gameConfig}/>
-            <GameGrid gameId={gameId} gridSlots={gridSlots} onSlotClick={handleSlotClick}/>
+            <GameGrid gameId={gameId} gridSlots={gridSlots} gameConfig={gameConfig} onSlotClick={handleSlotClick}/>
         </Box>
     )
 }

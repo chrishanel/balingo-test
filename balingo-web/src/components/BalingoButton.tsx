@@ -5,10 +5,11 @@ interface BalingoButtonProps {
     text: string;
     buttonColor: string;
     size?: 'small' | 'medium' | 'large';
+    sx?: object;
     onClick?: () => void;
 }
 
-export default function BalingoButton({text, buttonColor, size, onClick}: BalingoButtonProps) {
+export default function BalingoButton({text, buttonColor, size, sx, onClick}: BalingoButtonProps) {
 
     const buttonSize = useMemo(() => {
         switch (size) {
@@ -27,11 +28,10 @@ export default function BalingoButton({text, buttonColor, size, onClick}: Baling
         maxWidth: '95%',
         borderRadius: 4,
         boxShadow: '0 4px 0 0 rgba(0, 0, 0, 0.25)',
-
     }), [buttonColor, buttonSize])
 
     return (
-        <Button sx={buttonStyle} color={'white'} onClick={onClick}>
+        <Button sx={{...buttonStyle, ...sx}} color={'white'} onClick={onClick}>
             <Typography fontSize={36} sx={{textShadow: '0 3px 0 #000', textTransform: 'uppercase'}}>{text}</Typography>
         </Button>
     )

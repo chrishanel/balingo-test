@@ -5,10 +5,11 @@ const defaultBgColor = "#2E3A3C";
 
 interface GameGridSlotViewProps {
     slot?: GameGridSlot;
+    hasGameStarted: boolean;
     onClick?: () => void;
 }
 
-export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps) {
+export default function GameGridSlotView({slot, hasGameStarted, onClick}: GameGridSlotViewProps) {
     const {text, backgroundColor: slotBgColor, seedText, chipColor, showChip} = slot ?? {};
 
     const handleSlotClick = () => {
@@ -31,14 +32,16 @@ export default function GameGridSlotView({slot, onClick}: GameGridSlotViewProps)
                  }}
                  border={chipColor === 'gold' ? "3px solid #F2C255" : `3px solid ${backgroundColor}`}
                  bgcolor={backgroundColor ?? defaultBgColor} textAlign="center">
-                {showChip && chipColor && (
+                {hasGameStarted && showChip && chipColor && (
                     <Box position="absolute" top={0} right={0}>
                         <img src={`/images/chips/${chipColor}-chip.png`} alt={`${chipColor} poker chip`}/>
                     </Box>
                 )}
-                <Typography fontSize="24cqh" lineHeight="normal" pt={0.5}
-                            sx={{textShadow: "1.354px 1.354px 0 #000"}}>{text}</Typography>
-                {seedText && (
+                {hasGameStarted && (
+                    <Typography fontSize="24cqh" lineHeight="normal" pt={0.5}
+                                sx={{textShadow: "1.354px 1.354px 0 #000"}}>{text}</Typography>
+                )}
+                {hasGameStarted && seedText && (
                     <Box width="90%" bgcolor="#172325" borderRadius={1}
                          boxShadow="1.354px 1.354px 0 0 rgba(0, 0, 0, 0.40);">
                         <Typography fontSize={{xs: 14, sm: 28}} lineHeight={'normal'} pt={0.5}>{seedText}</Typography>
