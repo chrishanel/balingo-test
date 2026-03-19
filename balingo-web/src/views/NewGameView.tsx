@@ -46,7 +46,7 @@ export default function NewGameView() {
             setHasPlayerNameError(true);
         }
 
-        if (!hasGameCodeError && !hasPlayerNameError) {
+        if (!hasGameCodeError && !hasPlayerNameError && gameCode && playerName) {
             const isSuccessful = await createNewGame(gameCode, playerName, isBlue);
 
             if (isSuccessful) {

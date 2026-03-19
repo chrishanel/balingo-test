@@ -49,7 +49,7 @@ export default function GameInfoTabs() {
                     <ul>
                         <li>
                             <GameInfoTabText
-                                text="Balingo is a WIP prototype designed by Chris Hanel, inspired by many iterations of Bingo
+                                text="Balingo is a WIP prototype designed by Chris Hanel and drspectred, inspired by many iterations of Bingo
                             across the speedrunning community. If all goes well, the intention is to make this a proper
                             Balatro Mod with auto-tracking and more features that are both player-friendly and a better
                             viewing experience for spectators."/>

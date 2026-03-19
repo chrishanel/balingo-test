@@ -82,6 +82,9 @@ export const joinGame = async (gameCode: string, playerName: string, onComplete:
 
 export const createNewGame = async (gameCode: string, playerName: string, isBlue: boolean): Promise<boolean> => {
     try {
+        if (!gameCode || !playerName) {
+            return false;
+        }
         const auth = getAuth();
 
         const challenges = await getRandomChallenges();
